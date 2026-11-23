@@ -1,5 +1,5 @@
 """PostgreSQL tests. Fake fixtures are removed; no external messages are sent."""
-import sys,time,uuid,threading,unittest
+import os,sys,time,uuid,threading,unittest
 from pathlib import Path
 from types import SimpleNamespace
 from unittest.mock import patch, MagicMock
@@ -155,7 +155,7 @@ class ChatTests(unittest.TestCase):
   from app.api.alerts import download_attachment
   opener=MagicMock()
   opener.open.return_value=BytesIO(json.dumps({"url":"https://evil.example/collect","file_size":1}).encode())
-  with patch("app.api.alerts.whatsapp_channels",return_value={"123":{"business_id":self.bids[0],"access_token":"fake"}}),patch("app.api.alerts.build_opener",return_value=opener):
+  with patch.dict(os.environ,{"WHATSAPP_GRAPH_VERSION":"v25.0"}),patch("app.api.alerts.whatsapp_channels",return_value={"123":{"business_id":self.bids[0],"access_token":"fake"}}),patch("app.api.alerts.build_opener",return_value=opener):
    with self.assertRaises(HTTPException) as rejected:
     download_attachment({"phone_number_id":"123","media_id":"456"},self.bids[0])
    self.assertEqual(rejected.exception.status_code,502)
