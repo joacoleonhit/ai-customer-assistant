@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="es">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Asistente Comercial · Panel del local</title>
+<link rel="stylesheet" href="panel.css"><script src="panel.js" defer></script></head>
+<body>
+<header class="header"><a class="brand" href="./"><span class="brand-mark" aria-hidden="true">A</span><span>Asistente <strong>Comercial</strong></span></a><button id="logout" class="button" hidden>Salir del perfil</button></header>
+<main id="access" class="auth-layout">
+<section class="intro"><h1>Tu negocio.<br>Todo conectado.</h1><p>Gestioná los pedidos, el catálogo y los cobros del local en un mismo lugar.</p>
+<ul class="benefits"><li><span aria-hidden="true">✓</span> Pedidos organizados por estado</li><li><span aria-hidden="true">✓</span> Precios y disponibilidad en un catálogo</li><li><span aria-hidden="true">✓</span> Seguimiento de cobros y entregas</li></ul>
+<p class="intro-note">Demo de portfolio · FastAPI, PostgreSQL y agente conversacional. Explorá el flujo sin configurar servicios externos.</p></section>
+<section class="auth-card" aria-labelledby="auth-title">
+<div class="demo-entry"><span class="badge progress">Demo interactiva</span><h2>Conocé el asistente en acción</h2><p>Entrá a un local ficticio, conversá como cliente y seguí el pedido desde el panel del negocio.</p><button id="try-demo" class="button primary" type="button" disabled>Probar demo</button><p id="demo-entry-note" class="muted">Consultando disponibilidad…</p><p id="demo-entry-status" class="status" role="status" hidden></p></div>
+<details id="profile-access"><summary>Configurar o abrir un negocio propio</summary>
+<h2 id="auth-title">Crear perfil del negocio</h2><p id="auth-subtitle" class="muted">Completá los datos del local para abrir tu panel.</p>
+<form id="auth-form">
+<fieldset id="registration">
+<div class="field"><label for="name">Nombre y apellido</label><input id="name" name="name" autocomplete="name" required maxlength="120"></div>
+<div class="field"><label for="business-name">Nombre del local</label><input id="business-name" name="business_name" autocomplete="organization" required maxlength="150"></div>
+<div class="field"><label for="signup-alias">Alias de cobro</label><input id="signup-alias" name="alias" maxlength="64"><small>Podés indicar un alias o un CBU/CVU.</small></div>
+<div class="field"><label for="signup-cbu">CBU/CVU</label><input id="signup-cbu" name="cbu" inputmode="numeric" pattern="[0-9]{22}" maxlength="22"></div>
+</fieldset>
+<div class="field"><label for="email">Correo electrónico</label><input id="email" name="email" type="email" autocomplete="username" required maxlength="254" placeholder="nombre@tulocal.com"></div>
+<div class="field"><label for="password">Clave de acceso al perfil</label><div class="password-field"><input id="password" name="password" type="password" autocomplete="current-password" required maxlength="256"><button id="show-password" type="button" aria-pressed="false">Mostrar</button></div></div>
+<button id="auth-submit" class="button primary" type="submit">Crear perfil del negocio</button>
+</form>
+<p class="auth-switch"><span id="auth-question">¿Ya tenés un perfil?</span> <button id="auth-switch" type="button">Abrir mi perfil</button></p>
+<p class="status" id="auth-status" role="status" hidden></p></details>
+</section></main>
+<main id="panel" class="workspace" hidden>
+<div id="demo-banner" class="alert-summary" hidden><span>Modo demo · Datos ficticios. No se envían mensajes por WhatsApp ni se realizan cobros.</span><button id="new-demo" class="button" type="button">Nueva demo</button></div>
+<div class="page-head"><div><h1 id="panel-title">Pedidos</h1><p id="business-label" class="muted"></p></div><p class="muted" id="account-label"></p></div>
+<nav class="tabs" aria-label="Panel del local"><button data-tab="demo-chat" class="button" hidden>Probar como cliente</button><button data-tab="orders" class="button">Pedidos</button><button data-tab="inbox" class="button">Chats y alertas <span id="alert-count" aria-live="polite"></span></button><button data-tab="catalog" class="button">Catálogo</button><button data-tab="profile" class="button">Perfil</button></nav>
+<p class="status" id="panel-status" role="status" hidden></p>
+<div id="alert-summary" class="alert-summary" role="status" hidden><span id="alert-summary-text"></span><button id="view-alerts" class="button" type="button">Ver alertas</button></div>
+<section id="demo-chat" class="section-card" hidden>
+<div class="page-head"><div><h2>Conversá como cliente</h2><p id="demo-provider" class="muted"></p></div><button id="demo-see-orders" class="button" type="button">Ver pedidos del negocio</button></div>
+<p>Armá un pedido, confirmalo y revisá cómo aparece en Pedidos. Los reclamos se derivan a Chats y alertas.</p>
+<div class="demo-layout"><div><div id="demo-messages" class="chat-history" role="log" aria-label="Conversación de prueba" aria-live="polite"></div><p id="demo-chat-mode" class="muted" role="status"></p><form id="demo-message-form"><label for="demo-message">Tu mensaje como cliente</label><textarea id="demo-message" name="message" rows="3" maxlength="3000" required placeholder="Hola, ¿cuánto están las muzzas?"></textarea><div class="toolbar"><button id="demo-send" class="button primary" type="submit">Enviar mensaje</button><button id="demo-retry" class="button" type="button" hidden>Reintentar respuesta</button></div></form><p id="demo-chat-status" class="status" role="status" hidden></p></div>
+<aside class="demo-guide"><h3>Probá este recorrido</h3><p>Estos ejemplos completan el campo de mensaje; vos decidís cuándo enviarlos.</p><div id="demo-examples" class="conversation-list"></div><h3>Catálogo de prueba</h3><div id="demo-menu"></div><p class="muted">Los importes y el alias son ficticios. No transfieras dinero.</p></aside></div>
+</section>
+<section id="inbox" class="section-card" hidden>
+<div class="toolbar"><h2>Atención al cliente</h2><button id="reload-inbox" class="button" type="button">Actualizar</button></div>
+<p class="muted">Los reclamos pausan únicamente su chat. Un aviso de transferencia no confirma la acreditación.</p>
+<div id="alert-list" class="alert-list" aria-label="Alertas pendientes"></div>
+<div class="inbox-layout"><div><h2>Conversaciones</h2><div id="conversation-list" class="conversation-list"></div></div>
+<div id="chat-detail" hidden><div class="page-head"><h2 id="chat-title"></h2><span id="chat-state" class="badge"></span></div>
+<div class="toolbar"><button id="take-chat" class="button" type="button">Tomar control</button><button id="release-chat" class="button" type="button">Devolver a la IA</button><button id="chat-order" class="button" type="button" hidden>Ver pedido</button></div>
+<p class="muted">Tomar control bloquea respuestas automáticas pendientes. Marcar una alerta como atendida no devuelve el chat a la IA.</p>
+<div id="chat-history" class="chat-history" role="log" aria-label="Mensajes recientes"></div>
+<form id="chat-reply-form"><label for="chat-reply">Respuesta del local</label><textarea id="chat-reply" name="message" rows="3" maxlength="3000" required></textarea><button id="send-chat-reply" class="button primary" type="submit">Enviar respuesta</button></form>
+<p id="chat-status" class="status" role="status" hidden></p>
+</div><p id="chat-placeholder" class="empty">Seleccioná un chat para ver los mensajes recientes y atenderlo.</p></div>
+</section>
+<section id="orders" class="section-card">
+<div class="toolbar"><label for="order-filter">Estado del pedido</label><select id="order-filter"></select><button id="reload-orders" class="button">Actualizar</button></div>
+<div id="order-list" class="table-wrap" role="region" aria-label="Listado de pedidos" tabindex="0"></div>
+</section>
+<section id="catalog" class="section-card" hidden>
+<form id="product-form" class="inline-form" hidden>
+<label>Producto<input name="name" maxlength="150" required></label><label>Precio (ARS)<input name="price" type="number" min="0.01" step="0.01" max="99999999.99" required></label><button class="button primary">Agregar producto</button>
+</form><div id="product-list" class="table-wrap"></div>
+</section>
+<section id="profile" class="section-card" hidden>
+<h2>Datos de cobro</h2><form id="payment-form">
+<div class="field"><label for="provider">Proveedor</label><select id="provider" name="payment_provider"><option value="">Sin proveedor</option><option value="MERCADO_PAGO">Mercado Pago</option><option value="NARANJA_X">Naranja X</option><option value="BANCO_NACION">Banco Nación</option><option value="OTHER">Otro</option></select></div>
+<div class="field"><label for="alias">Alias</label><input id="alias" name="alias" maxlength="64"></div>
+<div class="field"><label for="cbu">CBU/CVU</label><input id="cbu" name="cbu" inputmode="numeric" pattern="[0-9]{22}" maxlength="22"></div>
+<button class="button primary">Guardar datos de cobro</button>
+</form>
+<div id="mercado-pago" class="integration"><h2>Mercado Pago</h2><p id="mp-status" class="muted"></p><button id="connect" class="button" type="button">Conectar Mercado Pago</button><button id="reload-profile" class="button" type="button">Actualizar conexión</button></div>
+<div id="whatsapp-settings" class="integration">
+<h2>WhatsApp Business</h2>
+<p>Para conectar tu local necesitás la aplicación <strong>WhatsApp Business</strong> en el celular. WhatsApp común no es compatible con esta conexión.</p>
+<section aria-labelledby="wa-new-number-title">
+<h3 id="wa-new-number-title">Una línea nueva para tu IA</h3>
+<ol><li>Conseguí una línea móvil o eSIM con tu operadora. Debe poder recibir el código de verificación por SMS o llamada.</li><li>Registrá esa línea en la aplicación WhatsApp Business y completá los datos del local.</li><li>Cuando esté habilitada la conexión real de Meta en nuestra app, podrás vincularla desde este perfil.</li></ol>
+<p class="muted">Nuestra app no vende ni asigna números telefónicos. La línea se obtiene por separado y su costo depende de la operadora. Por ahora, el botón siguiente permite únicamente una simulación; el número de prueba no recibe mensajes reales.</p>
+</section>
+<p id="wa-status" class="muted" role="status">Consultando conexión…</p>
+<div class="toolbar">
+<button id="wa-connect" class="button" type="button" hidden>Probar conexión simulada</button>
+<button id="wa-test" class="button" type="button" hidden>Verificar conexión de prueba</button>
+<button id="wa-disconnect" class="button" type="button" hidden>Desconectar prueba</button>
+</div></div>
+</section>
+</main>
+<dialog id="wa-dialog" class="dialog" aria-labelledby="wa-title">
+<div class="page-head"><h2 id="wa-title">Conectar WhatsApp Business</h2><form method="dialog"><button class="button">Cerrar</button></form></div>
+<p>Conectá un número ficticio para probar la configuración del local. Esta prueba no abre Meta ni envía mensajes.</p>
+<button id="wa-authorize" class="button primary" type="button">Conectar número de prueba</button>
+<p id="wa-dialog-status" class="status" role="status" hidden></p>
+</dialog>
+<dialog id="order-dialog" class="dialog" aria-labelledby="detail-title"><div class="page-head"><h2 id="detail-title">Pedido</h2><form method="dialog"><button class="button" aria-label="Cerrar detalle">Cerrar</button></form></div><div id="order-detail"></div>
+<div id="demo-payment" class="transfer-form" hidden><p>Simulación de pago. No se consulta un banco ni se cobra dinero.</p><div class="toolbar"><button id="demo-payment-approved" class="button primary" type="button">Simular pago aprobado</button><button id="demo-payment-rejected" class="button" type="button">Simular pago rechazado</button></div></div>
+<form id="transfer-form" class="transfer-form" hidden>
+<p>Verificá en los movimientos de la cuenta que ingresó el importe de este pedido antes de confirmarlo.</p>
+<label><input type="checkbox" name="verified" required> Verifiqué la acreditación en la cuenta.</label>
+<button class="button" type="submit">Confirmar transferencia</button>
+</form><form id="order-state-form" class="toolbar"><label for="new-state">Cambiar estado</label><select id="new-state"></select><button class="button primary">Guardar</button></form><p id="detail-status" class="status" role="status" hidden></p></dialog>
+<footer>Asistente Comercial</footer>
+</body></html>

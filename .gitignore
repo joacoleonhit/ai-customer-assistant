@@ -1,0 +1,32 @@
+# Credentials and local configuration
+.env
+.env.*
+**/.env
+**/.env.*
+!.env.example
+!**/.env.example
+.demo.env
+*.pem
+*.key
+# Runtime and dependencies
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+node_modules/
+*.log
+*.db
+*.sqlite*
+.pytest_cache/
+.coverage
+htmlcov/
+# Personal editor state and generated reports
+.vscode/
+backend/scripts/*results*.json
+backend/scripts/*summary*.json
+# Local skill installation
+.agents/
+
+# Local review copies
+README.preview.md
+README.previous.local.md

@@ -1,0 +1,14 @@
+.git
+.agents
+.vscode
+**/__pycache__
+**/.venv
+**/venv
+**/.env
+**/.env.*
+.demo.env
+**/*.log
+**/*results*.json
+**/*summary*.json
+backend/tests
+backend/scripts
